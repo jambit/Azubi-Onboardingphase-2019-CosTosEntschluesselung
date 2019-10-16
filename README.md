@@ -1,2 +1,2 @@
-# Entschl-sselung
-Das Entschlüsselungsprogramm für Alex und Jovans Verschlüsselungsprogramm
+# Entschluesselung
+Das Entschluesselungsprogramm für Alex und Jovans Verschlueselungsprogramm
