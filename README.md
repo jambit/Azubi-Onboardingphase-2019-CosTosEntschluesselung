@@ -1,2 +1,2 @@
 # Entschluesselung
-Das Entschluesselungsprogramm für Alex und Jovans Verschlueselungsprogramm
+Das Entschluesselungsprogramm für Alex und Finns Verschlueselungsprogramm
