@@ -10,5 +10,14 @@ public class Main {
 
         InputReader inputReader = new InputReader();
         final StringArray fileContent = inputReader.readFile("EncryptedText.txt");
+
+        DecryptionHelper decryptionHelper = new DecryptionHelper();
+        StringArray decryptFileContent = decryptionHelper.decrypt(fileContent);
+
+
+        for (int i = 0; i < decryptFileContent.getSize(); i++) {
+            System.out.println(decryptFileContent.get(i));
+        }
+
     }
 }
