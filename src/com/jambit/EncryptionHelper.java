@@ -55,7 +55,6 @@ public class EncryptionHelper {
             encryptedChar = keysetString.charAt(lookAtKeysetPos);
             encryptedLine = encryptedLine + encryptedChar;
         }
-        System.out.println(encryptedLine);
         return encryptedLine;
     }
 
@@ -79,7 +78,6 @@ public class EncryptionHelper {
             encryptedChar = keysetString.charAt(lookAtKeysetPos);
             encryptedLine = encryptedLine + encryptedChar;
         }
-        System.out.println(encryptedLine);
         return encryptedLine;
     }
 

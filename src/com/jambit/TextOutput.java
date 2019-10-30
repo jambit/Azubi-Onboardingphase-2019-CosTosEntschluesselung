@@ -13,9 +13,6 @@ public class TextOutput {
         FileWriter fw = new FileWriter("DecryptedText.txt", true);
         BufferedWriter bw = new BufferedWriter(fw);
 
-//        bw.newLine();
-//        bw.append(decryptedContent);
-
         String decryptedContentArray[] = decryptedContent.getArray();
 
         for (int i = 0; i < decryptedContentArray.length; i++) {
@@ -27,7 +24,6 @@ public class TextOutput {
                 bw.close();
             }
         }
-
     }
 
     public void writeFileEncryptedContend(StringArray encryptedContent) throws IOException {
