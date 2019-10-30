@@ -6,8 +6,7 @@ import java.util.Random;
 
 public class DecryptionHelper {
 
-    public String keysetString = "ABCDEFGHIJKLMNOPQRSTUVWXYZÄÜÖabcdefghijklmnopqrstuvwxyzäüöß0123456789,.!?\"§$%&/()" +
-            "=+-*\\_#~<>| ";
+    public String keysetString = UserInterface.keysetString;
 
     /**
 
