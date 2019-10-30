@@ -15,7 +15,7 @@ public class Main {
 
 
         EncryptionHelper encryptionHelper = new EncryptionHelper();
-        encryptionHelper.encrypt(sa,key1);
+        encryptionHelper.encrypt(sa,key1,seed);
 
 
         UserInterface userInterface = new UserInterface();
