@@ -55,6 +55,10 @@ public class UserInterface {
 
     void enterKeyAndDecrypt() throws IOException {
 
+       /* File tempFile = new File("C:\\Users\\ceisenschmid\\Downloads\\encrypted_file (2).txt");
+        boolean exists = tempFile.exists();
+        System.out.println(exists);*/
+
         InputReader inputReader = new InputReader();
         final StringArray encryptedFileContent = inputReader.readFile("EncryptedText.txt");
         final StringArray decryptedFileContent = inputReader.readFile("DecryptedText.txt");
