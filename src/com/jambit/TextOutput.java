@@ -9,19 +9,19 @@ import java.io.IOException;
 public class TextOutput {
 
 
-    public void writeFile(StringArray decryptedContend) throws IOException {
+    public void writeFile(StringArray decryptedContent) throws IOException {
         FileWriter fw = new FileWriter("DecryptedText.txt", true);
         BufferedWriter bw = new BufferedWriter(fw);
 
 //        bw.newLine();
-//        bw.append(decryptedContend);
+//        bw.append(decryptedContent);
 
-        String decryptedContendArray[] = decryptedContend.getArray();
+        String decryptedContentArray[] = decryptedContent.getArray();
 
-        for (int i = 0; i < decryptedContendArray.length; i++) {
+        for (int i = 0; i < decryptedContentArray.length; i++) {
 
-            if (decryptedContendArray[i] != null) {
-                bw.append(decryptedContendArray[i]);
+            if (decryptedContentArray[i] != null) {
+                bw.append(decryptedContentArray[i]);
                 bw.newLine();
             } else {
                 bw.close();
