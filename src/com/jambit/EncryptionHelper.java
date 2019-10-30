@@ -34,8 +34,7 @@ public class EncryptionHelper {
     }
 
 
-
-    String encrypt(String decryptedLine, int key){
+    String encrypt(String decryptedLine, int key) {
         int keysetLength = keysetString.length();
         int lineLength = decryptedLine.length();
         int charLocationInKeyset;
@@ -48,7 +47,7 @@ public class EncryptionHelper {
             charLocationInKeyset = keysetString.indexOf(currentChar);
             lookAtKeysetPos = charLocationInKeyset + key;
 
-            if (lookAtKeysetPos+1 > keysetLength) {
+            if (lookAtKeysetPos + 1 > keysetLength) {
                 lookAtKeysetPos = lookAtKeysetPos - keysetLength;
             }
             encryptedChar = keysetString.charAt(lookAtKeysetPos);
@@ -70,16 +69,14 @@ public class EncryptionHelper {
             charLocationInKeyset = keysetString.indexOf(currentChar);
             lookAtKeysetPos = charLocationInKeyset + key1;
 
-            if (lookAtKeysetPos > keysetLength) {
-                lookAtKeysetPos = lookAtKeysetPos + keysetLength;
+            if (lookAtKeysetPos + 1 > keysetLength) {
+                lookAtKeysetPos = lookAtKeysetPos - keysetLength;
             }
             encryptedChar = keysetString.charAt(lookAtKeysetPos);
             encryptedLine = encryptedLine + encryptedChar;
         }
         return encryptedLine;
     }
-
-
 
 
     private String swapIndex(String str, int i1, int i2) {
