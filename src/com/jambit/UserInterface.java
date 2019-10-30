@@ -2,14 +2,58 @@ package com.jambit;
 
 import com.sun.xml.internal.fastinfoset.util.StringArray;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Scanner;
 
 public class UserInterface {
     int key;
     int seed = 0;
+    StringArray content;
+    String pathname;
 
-    void enterKey() throws IOException {
+
+    void startUi() throws IOException {
+        Scanner sc = new Scanner(System.in);
+        while (true) {
+            System.out.println("do you want to encrypt[e] or decrypt[d] the file");
+            String input = sc.next();
+            switch (input) {
+                case "e":
+                    //Todo add encryption
+                    break;
+
+                case "d":
+                    if (checkFile("EncryptedText.txt")) {
+                        enterKeyAndDecrypt();
+                    } else {
+                        System.out.println("please enter a valid path + filename");
+                        pathname = sc.next();
+
+                        while (checkFile(pathname) == false) {
+                            System.out.println("please enter a valid path + filename");
+                            pathname = sc.next();
+                        }
+                    }
+                    printContend(content);
+                    writeDecryptedContentInFile(content);
+                    break;
+
+                default:
+                    break;
+            }
+        }
+    }
+
+    boolean checkFile(String pathname) {
+        boolean fileExists;
+        File file = new File(pathname);
+        fileExists = file.exists();
+        return fileExists;
+    }
+
+
+    void enterKeyAndDecrypt() throws IOException {
 
         InputReader inputReader = new InputReader();
         final StringArray encryptedFileContent = inputReader.readFile("EncryptedText.txt");
@@ -28,17 +72,26 @@ public class UserInterface {
         }
 
         DecryptionHelper decryptionHelper = new DecryptionHelper();
-        StringArray decryptFileContent;
+
         if (seed != 0) {
-            decryptFileContent = decryptionHelper.decrypt(encryptedFileContent, key,
+            content = decryptionHelper.decrypt(encryptedFileContent, key,
                     seed);
         } else {
-            decryptFileContent = decryptionHelper.decrypt(encryptedFileContent, key);
+            content = decryptionHelper.decrypt(encryptedFileContent, key);
         }
+    }
 
+
+    void printContend(StringArray content) {
         // prints out the decrypted text
-        for (int i = 0; i < decryptFileContent.getSize(); i++) {
-            System.out.println(decryptFileContent.get(i));
+        for (int i = 0; i < content.getSize(); i++) {
+            System.out.println(content.get(i));
         }
+    }
+
+
+    void writeDecryptedContentInFile(StringArray decryptedContent) throws IOException {
+        TextOutput textOutput = new TextOutput();
+        textOutput.writeFile(decryptedContent);
     }
 }
