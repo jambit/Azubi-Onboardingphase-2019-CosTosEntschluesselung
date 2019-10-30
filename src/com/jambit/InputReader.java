@@ -14,6 +14,26 @@ public class InputReader {
 
         StringArray content = new StringArray();
         String line;
+
+        do {
+            line = br.readLine();
+            if (line != null) {
+                content.add(line);
+//                System.out.println(line);
+            }
+        }
+        while (line != null);
+        br.close();
+        return content;
+    }
+
+    StringArray readFile() throws IOException {
+
+        FileReader fr = new FileReader("EncryptedText.txt");
+        BufferedReader br = new BufferedReader(fr);
+        StringArray content = new StringArray();
+        String line;
+
         do {
             line = br.readLine();
             if (line != null) {
