@@ -116,14 +116,12 @@ public class UserInterface {
         }
     }
 
-
     void printContend(StringArray content) {
         // prints out the decrypted text
         for (int i = 0; i < content.getSize(); i++) {
             System.out.println(content.get(i));
         }
     }
-
 
     void writeDecryptedContentInFile(StringArray decryptedContent) throws IOException {
         TextOutput textOutput = new TextOutput();

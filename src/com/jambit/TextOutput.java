@@ -31,7 +31,7 @@ public class TextOutput {
     }
 
     public void writeFileEncryptedContend(StringArray encryptedContent) throws IOException {
-        FileWriter fw = new FileWriter("DecryptedText.txt", true);
+        FileWriter fw = new FileWriter("EncryptedText.txt", true);
         BufferedWriter bw = new BufferedWriter(fw);
 
 //        bw.newLine();
