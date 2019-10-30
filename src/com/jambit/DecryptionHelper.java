@@ -8,7 +8,8 @@ public class DecryptionHelper {
 
     public String keysetString = "ABCDEFGHIJKLMNOPQRSTUVWXYZÄÜÖabcdefghijklmnopqrstuvwxyzäüöß0123456789,.!?\"§$%&/()" +
             "=+-*\\_#~<>| ";
-    /*
+
+    /**
 
      */
     StringArray decrypt(StringArray encryptedContent, int key1) {
@@ -62,7 +63,7 @@ public class DecryptionHelper {
         return decryptedLine;
     }
 
-    /*
+    /**
 
      */
     public String decrypt(String encryptedLine, int key1, int seed) {
