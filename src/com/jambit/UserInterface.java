@@ -2,6 +2,7 @@ package com.jambit;
 
 import com.sun.xml.internal.fastinfoset.util.StringArray;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Scanner;
 
@@ -10,6 +11,10 @@ public class UserInterface {
     int seed = 0;
 
     void enterKey() throws IOException {
+
+       /* File tempFile = new File("C:\\Users\\ceisenschmid\\Downloads\\encrypted_file (2).txt");
+        boolean exists = tempFile.exists();
+        System.out.println(exists);*/
 
         InputReader inputReader = new InputReader();
         final StringArray encryptedFileContent = inputReader.readFile("EncryptedText.txt");
