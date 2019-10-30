@@ -24,8 +24,44 @@ public class UserInterface {
             String input = sc.next();
             switch (input) {
                 case "e":
+                    System.out.println("do you want to generate a key and seed? [y] [n]");
+                    String doYou = sc.next();
+                    switch (doYou) {
+                        case "y":
+                            //todo add a random generator for seed and key
+                            break;
+
+                        case "n":
+                            System.out.println("please enter your [seed]:[key]");
+                            InputReader inputReader = new InputReader();
+                            final StringArray decryptedFileContent = inputReader.readFile("DecryptedText.txt");
+                            System.out.println("enter the decryption key:");
+
+                            String keyString = sc.next();
+                            String[] keyAndSeed = keyString.split(":");
+
+                            if (keyAndSeed.length == 2) {
+                                key = Integer.parseInt(keyAndSeed[1]);
+                                seed = Integer.parseInt(keyAndSeed[0]);
+                            } else {
+                                key = Integer.parseInt(keyAndSeed[0]);
+                            }
+
+                            EncryptionHelper encryptionHelper = new EncryptionHelper();
+                            if (seed != 0) {
+                                encryptedContent = encryptionHelper.encrypt(decryptedFileContent, key, seed);
+
+                            } else {
+                                encryptedContent = encryptionHelper.encrypt(decryptedFileContent, key);
+                            }
+                            break;
+
+                        default:
+                            break;
+                    }
                     if (checkFile("DecryptedText.txt")) {
-                        enterKeyAndEncrypt();
+
+                        //todo use encrypt method
                     } else {
                         System.out.println("please enter a valid path + filename");
                         pathname = sc.next();
