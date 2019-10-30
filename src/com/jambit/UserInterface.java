@@ -12,6 +12,9 @@ public class UserInterface {
     StringArray decryptedContent;
     StringArray encryptedContent;
     String pathname;
+    public static String keysetString = "ABCDEFGHIJKLMNOPQRSTUVWXYZÄÜÖabcdefghijklmnopqrstuvwxyzäüöß0123456789,.!?\"§$%&/" +
+            "()" +
+            "=+-*\\_#~<>| ";
 
 
     void startUi() throws IOException {
@@ -82,8 +85,8 @@ public class UserInterface {
 
         EncryptionHelper encryptionHelper = new EncryptionHelper();
         if (seed != 0) {
-            encryptedContent = encryptionHelper.encrypt(decryptedFileContent, key,
-                    seed);
+            encryptedContent = encryptionHelper.encrypt(decryptedFileContent, key, seed);
+
         } else {
             encryptedContent = encryptionHelper.encrypt(decryptedFileContent, key);
         }

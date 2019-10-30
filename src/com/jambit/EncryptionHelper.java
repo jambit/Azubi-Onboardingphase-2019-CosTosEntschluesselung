@@ -6,8 +6,7 @@ import java.util.Random;
 
 public class EncryptionHelper {
 
-    public String keysetString = "ABCDEFGHIJKLMNOPQRSTUVWXYZÄÜÖabcdefghijklmnopqrstuvwxyzäüöß0123456789,.!?\"§$%&/()" +
-            "=+-*\\_#~<>| ";
+    public String keysetString = UserInterface.keysetString;
 
     StringArray encrypt(StringArray decryptedContent, int key1) {
         StringArray encryptedContent = new StringArray();
@@ -21,13 +20,13 @@ public class EncryptionHelper {
         return encryptedContent;
     }
 
-    StringArray encrypt(StringArray decryptedContent, int key1, int seed) {
+    StringArray encrypt(StringArray decryptedContent, int key, int seed) {
         randomGenerator(seed);
         StringArray encryptedContent = new StringArray();
         String[] completeArray = decryptedContent.getArray();
         for (int i = 0; i < completeArray.length; i++) {
             if (completeArray[i] != null) {
-                String encryptedMessage = encrypt(completeArray[i], key1, seed);
+                String encryptedMessage = encrypt(completeArray[i], key, seed);
                 encryptedContent.add(encryptedMessage);
             }
         }
@@ -59,7 +58,6 @@ public class EncryptionHelper {
     }
 
     public String encrypt(String decryptedLine, int key1, int seed) {
-
         int keysetLength = keysetString.length();
         int lineLength = decryptedLine.length();
         int charLocationInKeyset;
@@ -70,9 +68,9 @@ public class EncryptionHelper {
         for (int i = 0; i < lineLength; i++) {
             char currentChar = decryptedLine.charAt(i);
             charLocationInKeyset = keysetString.indexOf(currentChar);
-            lookAtKeysetPos = charLocationInKeyset - key1;
+            lookAtKeysetPos = charLocationInKeyset + key1;
 
-            if (lookAtKeysetPos+1 > keysetLength) {
+            if (lookAtKeysetPos > keysetLength) {
                 lookAtKeysetPos = lookAtKeysetPos + keysetLength;
             }
             encryptedChar = keysetString.charAt(lookAtKeysetPos);
