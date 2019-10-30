@@ -9,7 +9,8 @@ import java.util.Scanner;
 public class UserInterface {
     int key;
     int seed = 0;
-    StringArray content;
+    StringArray decryptedContent;
+    StringArray encryptedContent;
     String pathname;
 
 
@@ -20,7 +21,19 @@ public class UserInterface {
             String input = sc.next();
             switch (input) {
                 case "e":
-                    //Todo add encryption
+                    if (checkFile("DecryptedText.txt")) {
+                        enterKeyAndEncrypt();
+                    } else {
+                        System.out.println("please enter a valid path + filename");
+                        pathname = sc.next();
+
+                        while (checkFile(pathname) == false) {
+                            System.out.println("please enter a valid path + filename");
+                            pathname = sc.next();
+                        }
+                    }
+                    printContend(encryptedContent);
+                    writeEncryptedContentInFile(encryptedContent);
                     break;
 
                 case "d":
@@ -35,8 +48,8 @@ public class UserInterface {
                             pathname = sc.next();
                         }
                     }
-                    printContend(content);
-                    writeDecryptedContentInFile(content);
+                    printContend(decryptedContent);
+                    writeDecryptedContentInFile(decryptedContent);
                     break;
 
                 default:
@@ -52,14 +65,36 @@ public class UserInterface {
         return fileExists;
     }
 
+    void enterKeyAndEncrypt() throws IOException {
+        InputReader inputReader = new InputReader();
+        final StringArray decryptedFileContent = inputReader.readFile("DecryptedText.txt");
+        System.out.println("enter the decryption key:");
+        Scanner scanner = new Scanner(System.in);
+        String keyString = scanner.next();
+        String[] keyAndSeed = keyString.split(":");
+
+        if (keyAndSeed.length == 2) {
+            key = Integer.parseInt(keyAndSeed[1]);
+            seed = Integer.parseInt(keyAndSeed[0]);
+        } else {
+            key = Integer.parseInt(keyAndSeed[0]);
+        }
+
+        EncryptionHelper encryptionHelper = new EncryptionHelper();
+        if (seed != 0) {
+            encryptedContent = encryptionHelper.encrypt(decryptedFileContent, key,
+                    seed);
+        } else {
+            encryptedContent = encryptionHelper.encrypt(decryptedFileContent, key);
+        }
+    }
 
     void enterKeyAndDecrypt() throws IOException {
 
         InputReader inputReader = new InputReader();
         final StringArray encryptedFileContent = inputReader.readFile("EncryptedText.txt");
-        final StringArray decryptedFileContent = inputReader.readFile("DecryptedText.txt");
 
-        System.out.println("enter the decryption key:");
+        System.out.println("enter a key (format: 12345:67 or just 67):");
         Scanner scanner = new Scanner(System.in);
         String keyString = scanner.next();
         String[] keyAndSeed = keyString.split(":");
@@ -74,10 +109,10 @@ public class UserInterface {
         DecryptionHelper decryptionHelper = new DecryptionHelper();
 
         if (seed != 0) {
-            content = decryptionHelper.decrypt(encryptedFileContent, key,
+            decryptedContent = decryptionHelper.decrypt(encryptedFileContent, key,
                     seed);
         } else {
-            content = decryptionHelper.decrypt(encryptedFileContent, key);
+            decryptedContent = decryptionHelper.decrypt(encryptedFileContent, key);
         }
     }
 
@@ -92,6 +127,11 @@ public class UserInterface {
 
     void writeDecryptedContentInFile(StringArray decryptedContent) throws IOException {
         TextOutput textOutput = new TextOutput();
-        textOutput.writeFile(decryptedContent);
+        textOutput.writeFileDecryptedContend(decryptedContent);
+    }
+
+    void writeEncryptedContentInFile(StringArray encryptedContent) throws IOException {
+        TextOutput textOutput = new TextOutput();
+        textOutput.writeFileEncryptedContend(encryptedContent);
     }
 }
