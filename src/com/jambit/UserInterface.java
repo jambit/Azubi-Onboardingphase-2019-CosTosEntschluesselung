@@ -1,6 +1,7 @@
 package com.jambit;
 
 import com.sun.xml.internal.fastinfoset.util.StringArray;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Random;
@@ -9,8 +10,8 @@ import java.util.Scanner;
 public class UserInterface {
 
     void startUi() throws IOException {
+
         Scanner sc = new Scanner(System.in);
-        EnDeCryption enDeCryption = new EnDeCryption();
         while (true) {
             System.out.println("do you want to encrypt[e] or decrypt[d] the file");
             String input = sc.next();
@@ -29,11 +30,7 @@ public class UserInterface {
                             break;
 
                         case "n":
-                            System.out.println("please enter your [seed]:[key]");
-                            input = sc.next();
-                            CodecUtility seedAndKey = splitSeedAndKey(input);
-                            encryptedContent = enDeCryption.encrypt(decryptedFileContent, seedAndKey.getKey(),
-                                    seedAndKey.getSeed());
+                            encryptWithoutRandoms();
                             break;
 
                         default:
@@ -43,6 +40,7 @@ public class UserInterface {
                     break;
 
                 case "d":
+//                   todo fix everything
                     System.out.println("please enter your [seed]:[key]");
 
                     input = sc.next();
@@ -64,21 +62,38 @@ public class UserInterface {
         }
     }
 
-    /**
-     * @return
-     */
-    private StringArray encryptWithRandoms() {
-        EnDeCryption enDeCryption = new EnDeCryption();
+    private void encryptWithoutRandoms() throws IOException {
+        Scanner sc = new Scanner(System.in);
+        System.out.println("please enter your [seed]:[key]");
+        String input = sc.next();
+        CodecUtility seedAndKey = splitSeedAndKey(input);
+        int seed = seedAndKey.getSeed();
+        int key = seedAndKey.getKey();
+        encryptFromToWithSeedAndKey(Constants.DEFAULT_DECRYPTED_FILE_PATH, Constants.DEFAULT_ENCRYPTED_FILE_PATH, seed, key);
+    }
+
+    private void encryptWithRandoms() throws IOException {
+        CodecUtility codecUtility = new CodecUtility();
         CodecUtility randomKeyAndSeed = null;
         randomKeyAndSeed.setKey(generateRandomKey());
         randomKeyAndSeed.setSeed(generateRandomSeed());
         System.out.println("your seed and key are: " + randomKeyAndSeed.getSeed() + ":" + randomKeyAndSeed.getKey());
-        return enDeCryption.encrypt(decryptedContent, randomKeyAndSeed.getKey(), randomKeyAndSeed.getSeed());
+        int seed = codecUtility.getSeed();
+        int key = codecUtility.getKey();
+        encryptFromToWithSeedAndKey(Constants.DEFAULT_DECRYPTED_FILE_PATH, Constants.DEFAULT_ENCRYPTED_FILE_PATH, seed, key);
     }
 
-    private StringArray readFile(String s) throws IOException {
+    private void encryptFromToWithSeedAndKey(String pathFrom, String pathTo, int seed, int key) throws IOException {
         InputReader inputReader = new InputReader();
-        return inputReader.readFile(s);
+        OutputWriter outputWriter = new OutputWriter();
+        EnDeCryption enDeCryption = new EnDeCryption();
+        outputWriter.writeFile(enDeCryption.encrypt(inputReader.readFile(pathFrom), key, seed), pathTo);
+    }
+
+
+    private StringArray readFile(String filePath) throws IOException {
+        InputReader inputReader = new InputReader();
+        return inputReader.readFile(filePath);
     }
 
     private StringArray printSeedMenue() throws IOException {
