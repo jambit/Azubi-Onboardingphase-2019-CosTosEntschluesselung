@@ -1,224 +1,240 @@
 package com.jambit;
 
 import com.sun.xml.internal.fastinfoset.util.StringArray;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.Random;
 import java.util.Scanner;
 
 public class UserInterface {
-    int key;
-    int seed = 0;
-    StringArray decryptedContent;
-    StringArray encryptedContent;
-    String pathname;
-    public static String keysetString = "ABCDEFGHIJKLMNOPQRSTUVWXYZÄÜÖabcdefghijklmnopqrstuvwxyzäüöß0123456789,.!?\"§$%&/" +
-            "()" +
-            "=+-*\\_#~<>| ";
+
+   int key;
+   int seed = 0;
+   StringArray decryptedContent;
+   StringArray encryptedContent;
+   String pathname;
+   public static String keysetString =
+       "ABCDEFGHIJKLMNOPQRSTUVWXYZÄÜÖabcdefghijklmnopqrstuvwxyzäüöß0123456789,.!?\"§$%&/"
+           +
+           "()" +
+           "=+-*\\_#~<>| ";
 
 
-    void startUi() throws IOException {
-        Scanner sc = new Scanner(System.in);
-        while (true) {
-            System.out.println("do you want to encrypt[e] or decrypt[d] the file");
-            String input = sc.next();
-            switch (input) {
-                case "e":
-                    System.out.println("do you want to generate a key and seed? [y] [n]");
-                    String doYou = sc.next();
-                    switch (doYou) {
-                        case "y":
-                            key = getRandomKey();
-                            seed = getRandomSeed();
-                            System.out.println("your seed and key are: " + seed + ":" + key);
-                            break;
+   void startUi() throws IOException {
+      Scanner sc = new Scanner(System.in);
+      EncryptionHelper encryptionHelper = new EncryptionHelper();
+      while (true) {
+         System.out.println("do you want to encrypt[e] or decrypt[d] the file");
+         String input = sc.next();
 
-                        case "n":
-                            final StringArray decryptedFileContent = printSeedMenue();
+         switch (input) {
+            case "e":
+               final StringArray decryptedFileContent = readFile(
+                   "DecryptedText.txt");
+               System.out
+                   .println("do you want to generate a key and seed? [y] [n]");
+               input = sc.next();
 
-                            EncryptionHelper encryptionHelper = new EncryptionHelper();
-                            if (seed != 0) {
-                                encryptedContent = encryptionHelper.encrypt(decryptedFileContent, key, seed);
+               switch (input) {
+                  case "y":
+                     CodecUtility randomKeyAndSeed = splitSeedAndKey(input);
+                     randomKeyAndSeed.setKey(generateRandomKey());
+                     randomKeyAndSeed.setSeed(generateRandomSeed());
+                     System.out.println("your seed and key are: " + randomKeyAndSeed.getSeed() + ":" + randomKeyAndSeed.getKey());
+                     encryptionHelper.encrypt(decryptedContent, randomKeyAndSeed.getSeed(), randomKeyAndSeed.getKey());
+                     break;
 
-                            } else {
-                                encryptedContent = encryptionHelper.encrypt(decryptedFileContent, key);
-                            }
-                            break;
+                  case "n":
+                     System.out.println("please enter your [seed]:[key]");
 
-                        default:
-                            break;
-                    }
-                    if (checkFile("DecryptedText.txt")) {
+                     input = sc.next();
+                     CodecUtility seedAndKey = splitSeedAndKey(input);
 
-                        //todo use encrypt method
-                    } else {
-                        System.out.println("please enter a valid path + filename");
-                        pathname = sc.next();
+                     if (seedAndKey.getSeed() != 0) { //if seed is supplied
+                        encryptedContent = encryptionHelper
+                            .encrypt(decryptedFileContent, seedAndKey.getKey(), seedAndKey.getSeed());
 
-                        while (checkFile(pathname) == false) {
-                            System.out.println("please enter a valid path + filename");
-                            pathname = sc.next();
-                        }
-                    }
-                    printContent(encryptedContent);
-                    writeEncryptedContentInFile(encryptedContent);
-                    break;
+                     } else {
+                        encryptedContent = encryptionHelper //if seed is not supplied
+                            .encrypt(decryptedFileContent, seedAndKey.getKey());
+                     }
+                     break;
 
-                case "d":
-                    if (checkFile("EncryptedText.txt")) {
-                        enterKeyAndDecrypt();
-                    } else {
-                        System.out.println("please enter a valid path + filename");
-                        pathname = sc.next();
+                  default:
+                     break;
+               }
+               if (checkFile("DecryptedText.txt")) {
 
-                        while (checkFile(pathname) == false) {
-                            System.out.println("please enter a valid path + filename");
-                            pathname = sc.next();
-                        }
-                    }
-                    printContent(decryptedContent);
-                    writeDecryptedContentInFile(decryptedContent);
-                    break;
+                  //todo use encrypt method
+               } else {
+                  System.out.println("please enter a valid path + filename");
+                  pathname = sc.next();
 
-                default:
-                    break;
-            }
-        }
-    }
+                  while (checkFile(pathname) == false) {
+                     System.out.println("please enter a valid path + filename");
+                     pathname = sc.next();
+                  }
+               }
+               printContent(encryptedContent);
+               writeEncryptedContentInFile(encryptedContent);
+               break;
 
-    private StringArray printSeedMenue() throws IOException {
-        Scanner sc = new Scanner(System.in);
-        InputReader inputReader = new InputReader();
+            case "d":
+               if (checkFile("EncryptedText.txt")) {
+                  enterKeyAndDecrypt();
+               } else {
+                  System.out.println("please enter a valid path + filename");
+                  pathname = sc.next();
 
-        System.out.println("please enter your [seed]:[key]");
+                  while (checkFile(pathname) == false) {
+                     System.out.println("please enter a valid path + filename");
+                     pathname = sc.next();
+                  }
+               }
+               printContent(decryptedContent);
+               writeDecryptedContentInFile(decryptedContent);
+               break;
 
-        //Todo: Extract to METHOD
-        final StringArray decryptedFileContent = inputReader.readFile("DecryptedText.txt");
-        System.out.println("enter the decryption key:");
+            default:
+               break;
+         }
+      }
+   }
 
-        String keyString = sc.next();
-        String[] keyAndSeed1 = getKeyAndSeed(keyString);
-        return decryptedFileContent;
-    }
+   private StringArray readFile(String s) throws IOException {
+      InputReader inputReader = new InputReader();
+      return inputReader.readFile(s);
+   }
 
-    private String[] getKeyAndSeed(String keyString) {
-        String[] keyAndSeed = keyString.split(":");
+   private StringArray printSeedMenue() throws IOException {
+      Scanner sc = new Scanner(System.in);
+      InputReader inputReader = new InputReader();
 
-        if (keyAndSeed.length == 2) {
-            key = Integer.parseInt(keyAndSeed[1]);
-            seed = Integer.parseInt(keyAndSeed[0]);
-        } else {
-            try {
-                key = Integer.parseInt(keyAndSeed[0]);
-            }
-            catch (NumberFormatException e){
-                System.out.println("THE HELL IS OPEN");
-            }
-        }
-        return keyAndSeed;
-    }
+      System.out.println("please enter your [seed]:[key]");
 
-    boolean checkFile(String pathname) {
-        boolean fileExists;
-        File file = new File(pathname);
-        fileExists = file.exists();
-        return fileExists;
-    }
+      //Todo: Extract to METHOD
+      final StringArray decryptedFileContent = inputReader
+          .readFile("DecryptedText.txt");
+      return decryptedFileContent;
+   }
 
-    void enterKeyAndEncrypt() throws IOException {
-        InputReader inputReader = new InputReader();
-        final StringArray decryptedFileContent = inputReader.readFile("DecryptedText.txt");
-        System.out.println("enter the decryption key:");
-        Scanner scanner = new Scanner(System.in);
-        String keyString = scanner.next();
-        String[] keyAndSeed = keyString.split(":");
+   private CodecUtility splitSeedAndKey(String keyString) {
+      String[] keyAndSeed = keyString.split(":");
+      CodecUtility codecUtility = new CodecUtility();
 
-        if (keyAndSeed.length == 2) {
-            key = Integer.parseInt(keyAndSeed[1]);
-            seed = Integer.parseInt(keyAndSeed[0]);
-        } else {
-            key = Integer.parseInt(keyAndSeed[0]);
-        }
+      try {
+         if (keyAndSeed.length == 2) {
+            codecUtility.setKey(Integer.parseInt(keyAndSeed[1]));
+            codecUtility.setSeed(Integer.parseInt(keyAndSeed[0]));
+         }
+      } catch (NumberFormatException e) {
+         System.out.println("Invalid input. Try again");
+      }
 
-        EncryptionHelper encryptionHelper = new EncryptionHelper();
-        if (seed != 0) {
-            encryptedContent = encryptionHelper.encrypt(decryptedFileContent, key, seed);
+      return codecUtility;
+   }
 
-        } else {
-            encryptedContent = encryptionHelper.encrypt(decryptedFileContent, key);
-        }
-    }
+   boolean checkFile(String pathname) {
+      boolean fileExists;
+      File file = new File(pathname);
+      fileExists = file.exists();
+      return fileExists;
+   }
 
-    void enterKeyAndDecrypt() throws IOException {
+   void enterKeyAndEncrypt() throws IOException {
+      final StringArray decryptedFileContent = readFile("DecryptedText.txt");
+      System.out.println("enter the decryption key:");
+      Scanner scanner = new Scanner(System.in);
+      String keyString = scanner.next();
+      String[] keyAndSeed = keyString.split(":");
 
-        InputReader inputReader = new InputReader();
-        final StringArray encryptedFileContent = inputReader.readFile("EncryptedText.txt");
+      if (keyAndSeed.length == 2) {
+         key = Integer.parseInt(keyAndSeed[1]);
+         seed = Integer.parseInt(keyAndSeed[0]);
+      } else {
+         key = Integer.parseInt(keyAndSeed[0]);
+      }
 
-        System.out.println("enter a key (format: 12345:67 or just 67):");
-        Scanner scanner = new Scanner(System.in);
-        String keyString = scanner.next();
-        String[] keyAndSeed = keyString.split(":");
+      EncryptionHelper encryptionHelper = new EncryptionHelper();
+      if (seed != 0) {
+         encryptedContent = encryptionHelper
+             .encrypt(decryptedFileContent, key, seed);
 
-        if (keyAndSeed.length == 2) {
-            key = Integer.parseInt(keyAndSeed[1]);
-            seed = Integer.parseInt(keyAndSeed[0]);
-        } else {
-            key = Integer.parseInt(keyAndSeed[0]);
-        }
+      } else {
+         encryptedContent = encryptionHelper.encrypt(decryptedFileContent, key);
+      }
+   }
 
-        DecryptionHelper decryptionHelper = new DecryptionHelper();
+   void enterKeyAndDecrypt() throws IOException {
 
-        if (seed != 0) {
-            decryptedContent = decryptionHelper.decrypt(encryptedFileContent, key,
-                    seed);
-        } else {
-            decryptedContent = decryptionHelper.decrypt(encryptedFileContent, key);
-        }
-    }
+      final StringArray encryptedFileContent = readFile("EncryptedText.txt");
 
-    void printContent(StringArray content) {
-        // prints out the decrypted text
-        for (int i = 0; i < content.getSize(); i++) {
-            System.out.println(content.get(i));
-        }
-    }
+      System.out.println("enter a key (format: 12345:67 or just 67):");
+      Scanner scanner = new Scanner(System.in);
+      String keyString = scanner.next();
+      String[] keyAndSeed = keyString.split(":");
 
-    void writeDecryptedContentInFile(StringArray decryptedContent) throws IOException {
-        TextOutput textOutput = new TextOutput();
-        textOutput.writeFileDecryptedContend(decryptedContent);
-    }
+      if (keyAndSeed.length == 2) {
+         key = Integer.parseInt(keyAndSeed[1]);
+         seed = Integer.parseInt(keyAndSeed[0]);
+      } else {
+         key = Integer.parseInt(keyAndSeed[0]);
+      }
 
-    void writeEncryptedContentInFile(StringArray encryptedContent) throws IOException {
-        TextOutput textOutput = new TextOutput();
-        textOutput.writeFileEncryptedContend(encryptedContent);
-    }
+      DecryptionHelper decryptionHelper = new DecryptionHelper();
 
-    private int getRandomKey() {
-        int min = 1;
-        int max = keysetString.length() - 1;
-        Random r = new Random();
-        return r.nextInt((max - min) + 1) + min;
-    }
+      if (seed != 0) {
+         decryptedContent = decryptionHelper.decrypt(encryptedFileContent, key,
+             seed);
+      } else {
+         decryptedContent = decryptionHelper.decrypt(encryptedFileContent, key);
+      }
+   }
 
-    private int getRandomSeed() {
-        int min = -2147483648;
-        int max = 2147483647;
-        Random r = new Random();
-        return r.nextInt((max - min) + 1) + min;
-    }
+   void printContent(StringArray content) {
+      // prints out the decrypted text
+      for (int i = 0; i < content.getSize(); i++) {
+         System.out.println(content.get(i));
+      }
+   }
 
-    private boolean checkSeedKeyFormat(String seedKey) {
+   void writeDecryptedContentInFile(StringArray decryptedContent)
+       throws IOException {
+      TextOutput textOutput = new TextOutput();
+      textOutput.writeFileDecryptedContend(decryptedContent);
+   }
 
-        String[] keyAndSeed = seedKey.split(":");
+   void writeEncryptedContentInFile(StringArray encryptedContent)
+       throws IOException {
+      TextOutput textOutput = new TextOutput();
+      textOutput.writeFileEncryptedContend(encryptedContent);
+   }
 
-        if (keyAndSeed.length == 2) {
-            key = Integer.parseInt(keyAndSeed[1]);
-            seed = Integer.parseInt(keyAndSeed[0]);
-        } else {
-            key = Integer.parseInt(keyAndSeed[0]);
-        }
-        return true;
+   private int generateRandomKey() {
+      int min = 1;
+      int max = keysetString.length() - 1;
+      Random r = new Random();
+      return r.nextInt((max - min) + 1) + min;
+   }
 
-    }
+   private int generateRandomSeed() {
+      int min = -2147483648;
+      int max = 2147483647;
+      Random r = new Random();
+      return r.nextInt((max - min) + 1) + min;
+   }
+
+   private boolean checkSeedKeyFormat(String seedKey) {
+
+      String[] keyAndSeed = seedKey.split(":");
+
+      if (keyAndSeed.length == 2) {
+         key = Integer.parseInt(keyAndSeed[1]);
+         seed = Integer.parseInt(keyAndSeed[0]);
+      } else {
+         key = Integer.parseInt(keyAndSeed[0]);
+      }
+      return true;
+
+   }
 }
