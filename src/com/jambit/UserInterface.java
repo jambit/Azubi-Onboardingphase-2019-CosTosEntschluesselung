@@ -4,6 +4,7 @@ import com.sun.xml.internal.fastinfoset.util.StringArray;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Random;
 import java.util.Scanner;
 
 public class UserInterface {
@@ -28,7 +29,9 @@ public class UserInterface {
                     String doYou = sc.next();
                     switch (doYou) {
                         case "y":
-                            //todo add a random generator for seed and key
+                            key = getRandomKey();
+                            seed = getRandomSeed();
+                            System.out.println("your seed and key are: " + seed + ":" + key);
                             break;
 
                         case "n":
@@ -71,7 +74,7 @@ public class UserInterface {
                             pathname = sc.next();
                         }
                     }
-                    printContend(encryptedContent);
+                    printContent(encryptedContent);
                     writeEncryptedContentInFile(encryptedContent);
                     break;
 
@@ -87,7 +90,7 @@ public class UserInterface {
                             pathname = sc.next();
                         }
                     }
-                    printContend(decryptedContent);
+                    printContent(decryptedContent);
                     writeDecryptedContentInFile(decryptedContent);
                     break;
 
@@ -155,7 +158,7 @@ public class UserInterface {
         }
     }
 
-    void printContend(StringArray content) {
+    void printContent(StringArray content) {
         // prints out the decrypted text
         for (int i = 0; i < content.getSize(); i++) {
             System.out.println(content.get(i));
@@ -170,5 +173,34 @@ public class UserInterface {
     void writeEncryptedContentInFile(StringArray encryptedContent) throws IOException {
         TextOutput textOutput = new TextOutput();
         textOutput.writeFileEncryptedContend(encryptedContent);
+    }
+
+    private int getRandomKey() {
+        int min = 1;
+        int max = keysetString.length() - 1;
+        Random r = new Random();
+        return r.nextInt((max - min) + 1) + min;
+    }
+
+    private int getRandomSeed() {
+        int min = -2147483648;
+        int max = 2147483647;
+        Random r = new Random();
+        return r.nextInt((max - min) + 1) + min;
+    }
+
+    private boolean checkSeedKeyFormat(String seedKey){
+        boolean isOk;
+
+        String[] keyAndSeed = seedKey.split(":");
+
+        if (keyAndSeed.length == 2) {
+            key = Integer.parseInt(keyAndSeed[1]);
+            seed = Integer.parseInt(keyAndSeed[0]);
+        } else {
+            key = Integer.parseInt(keyAndSeed[0]);
+        }
+
+        return isOk;
     }
 }
