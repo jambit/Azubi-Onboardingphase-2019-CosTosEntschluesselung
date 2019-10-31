@@ -35,20 +35,7 @@ public class UserInterface {
                             break;
 
                         case "n":
-                            System.out.println("please enter your [seed]:[key]");
-                            InputReader inputReader = new InputReader();
-                            final StringArray decryptedFileContent = inputReader.readFile("DecryptedText.txt");
-                            System.out.println("enter the decryption key:");
-
-                            String keyString = sc.next();
-                            String[] keyAndSeed = keyString.split(":");
-
-                            if (keyAndSeed.length == 2) {
-                                key = Integer.parseInt(keyAndSeed[1]);
-                                seed = Integer.parseInt(keyAndSeed[0]);
-                            } else {
-                                key = Integer.parseInt(keyAndSeed[0]);
-                            }
+                            final StringArray decryptedFileContent = printSeedMenue();
 
                             EncryptionHelper encryptionHelper = new EncryptionHelper();
                             if (seed != 0) {
@@ -98,6 +85,38 @@ public class UserInterface {
                     break;
             }
         }
+    }
+
+    private StringArray printSeedMenue() throws IOException {
+        Scanner sc = new Scanner(System.in);
+        InputReader inputReader = new InputReader();
+
+        System.out.println("please enter your [seed]:[key]");
+
+        //Todo: Extract to METHOD
+        final StringArray decryptedFileContent = inputReader.readFile("DecryptedText.txt");
+        System.out.println("enter the decryption key:");
+
+        String keyString = sc.next();
+        String[] keyAndSeed1 = getKeyAndSeed(keyString);
+        return decryptedFileContent;
+    }
+
+    private String[] getKeyAndSeed(String keyString) {
+        String[] keyAndSeed = keyString.split(":");
+
+        if (keyAndSeed.length == 2) {
+            key = Integer.parseInt(keyAndSeed[1]);
+            seed = Integer.parseInt(keyAndSeed[0]);
+        } else {
+            try {
+                key = Integer.parseInt(keyAndSeed[0]);
+            }
+            catch (NumberFormatException e){
+                System.out.println("THE HELL IS OPEN");
+            }
+        }
+        return keyAndSeed;
     }
 
     boolean checkFile(String pathname) {
@@ -189,8 +208,7 @@ public class UserInterface {
         return r.nextInt((max - min) + 1) + min;
     }
 
-    private boolean checkSeedKeyFormat(String seedKey){
-        boolean isOk;
+    private boolean checkSeedKeyFormat(String seedKey) {
 
         String[] keyAndSeed = seedKey.split(":");
 
@@ -200,7 +218,7 @@ public class UserInterface {
         } else {
             key = Integer.parseInt(keyAndSeed[0]);
         }
+        return true;
 
-        return isOk;
     }
 }
