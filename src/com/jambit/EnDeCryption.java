@@ -5,6 +5,47 @@ import java.util.Random;
 
 public class EnDeCryption {
 
+
+    StringArray decrypt(StringArray encryptedContent, int key, int seed) {
+        String keyset = Constants.KEYSETSTRING;
+        if(seed != 0){
+            keyset = randomGenerator(seed);
+        }
+        StringArray decryptedContent = new StringArray();
+        String[] completeArray = encryptedContent.getArray();
+        for (int i = 0; i < completeArray.length; i++) {
+            if (completeArray[i] != null) {
+                String decryptedMessage = decrypt(completeArray[i], key, keyset);
+                decryptedContent.add(decryptedMessage);
+            }
+        }
+        return decryptedContent;
+    }
+
+    public String decrypt(String encryptedLine, int key ,String keyset) {
+
+        int keysetLength = keyset.length();
+        int lineLength = encryptedLine.length();
+        int charLocationInKeyset;
+        int lookAtKeysetPos;
+        char decryptedChar;
+        String decryptedLine = "";
+
+        for (int i = 0; i < lineLength; i++) {
+            char currentChar = encryptedLine.charAt(i);
+            charLocationInKeyset = keyset.indexOf(currentChar);
+            lookAtKeysetPos = charLocationInKeyset - key;
+
+            if (lookAtKeysetPos < 0) {
+                lookAtKeysetPos = lookAtKeysetPos + keysetLength;
+            }
+            decryptedChar = keyset.charAt(lookAtKeysetPos);
+            decryptedLine = decryptedLine + decryptedChar;
+        }
+        return decryptedLine;
+    }
+
+
     StringArray encrypt(StringArray decryptedContent, int key, int seed) {
         String keyset = Constants.KEYSETSTRING;
         if(seed != 0){
