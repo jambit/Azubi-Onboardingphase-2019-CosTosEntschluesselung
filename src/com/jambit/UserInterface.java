@@ -35,7 +35,7 @@ public class UserInterface {
                             pathname = sc.next();
                         }
                     }
-                    printContend(encryptedContent);
+                    printContent(encryptedContent);
                     writeEncryptedContentInFile(encryptedContent);
                     break;
 
@@ -51,7 +51,7 @@ public class UserInterface {
                             pathname = sc.next();
                         }
                     }
-                    printContend(decryptedContent);
+                    printContent(decryptedContent);
                     writeDecryptedContentInFile(decryptedContent);
                     break;
 
@@ -119,7 +119,7 @@ public class UserInterface {
         }
     }
 
-    void printContend(StringArray content) {
+    void printContent(StringArray content) {
         // prints out the decrypted text
         for (int i = 0; i < content.getSize(); i++) {
             System.out.println(content.get(i));
@@ -128,11 +128,11 @@ public class UserInterface {
 
     void writeDecryptedContentInFile(StringArray decryptedContent) throws IOException {
         TextOutput textOutput = new TextOutput();
-        textOutput.writeFileDecryptedContend(decryptedContent);
+        textOutput.writeFileDecryptedContent(decryptedContent);
     }
 
     void writeEncryptedContentInFile(StringArray encryptedContent) throws IOException {
         TextOutput textOutput = new TextOutput();
-        textOutput.writeFileEncryptedContend(encryptedContent);
+        textOutput.writeFileEncryptedContent(encryptedContent);
     }
 }

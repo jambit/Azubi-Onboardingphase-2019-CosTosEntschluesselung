@@ -9,7 +9,7 @@ import java.io.IOException;
 public class TextOutput {
 
 
-    public void writeFileDecryptedContend(StringArray decryptedContent) throws IOException {
+    public void writeFileDecryptedContent(StringArray decryptedContent) throws IOException {
         FileWriter fw = new FileWriter("DecryptedText.txt", true);
         BufferedWriter bw = new BufferedWriter(fw);
 
@@ -26,7 +26,7 @@ public class TextOutput {
         }
     }
 
-    public void writeFileEncryptedContend(StringArray encryptedContent) throws IOException {
+    public void writeFileEncryptedContent(StringArray encryptedContent) throws IOException {
         FileWriter fw = new FileWriter("EncryptedText.txt", true);
         BufferedWriter bw = new BufferedWriter(fw);
 
