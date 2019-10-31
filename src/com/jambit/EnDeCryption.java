@@ -1,40 +1,28 @@
 package com.jambit;
 
 import com.sun.xml.internal.fastinfoset.util.StringArray;
-
 import java.util.Random;
 
-public class EncryptionHelper {
-
-    StringArray encrypt(StringArray decryptedContent, int key1) {
-        StringArray encryptedContent = new StringArray();
-        String[] completeArray = decryptedContent.getArray();
-        for (int i = 0; i < completeArray.length; i++) {
-            if (completeArray[i] != null) {
-                String encryptedMessage = encrypt(completeArray[i], key1);
-                encryptedContent.add(encryptedMessage);
-            }
-        }
-        return encryptedContent;
-    }
+public class EnDeCryption {
 
     StringArray encrypt(StringArray decryptedContent, int key, int seed) {
-        randomGenerator(seed);
+        String keyset = Constants.KEYSETSTRING;
+        if(seed != 0){
+            keyset = randomGenerator(seed);
+        }
         StringArray encryptedContent = new StringArray();
         String[] completeArray = decryptedContent.getArray();
         for (int i = 0; i < completeArray.length; i++) {
             if (completeArray[i] != null) {
-                String encryptedMessage = encrypt(completeArray[i], key);
+                String encryptedMessage = encrypt(completeArray[i], key ,keyset);
                 encryptedContent.add(String.valueOf(encryptedMessage));
             }
         }
         return encryptedContent;
     }
 
-
-    String encrypt(String decryptedLine, int key) {
-        String keyset = Constants.KEYSETSTRING;
-        int keysetLength = Constants.KEYSETSTRING.length();
+    String encrypt(String decryptedLine, int key, String keyset) {
+        int keysetLength = keyset.length();
         int lineLength = decryptedLine.length();
         int charLocationInKeyset;
         int lookAtKeysetPos;
@@ -55,7 +43,6 @@ public class EncryptionHelper {
         return encryptedLine;
     }
 
-
     /**
      * Swap 2 indexes in a string
      * @param str string to swap string
@@ -75,16 +62,15 @@ public class EncryptionHelper {
      * @param seed seed to use for the randomization
      */
     public String randomGenerator(int seed) {
-        String keyset = "";
+        String changedKeyset = "";
         Random generator = new Random(seed);
         for (int i = 1; i < generator.nextInt(1000); i++) {
-            for (int j = 0; j < keyset.length(); j++) {
+            for (int j = 0; j < Constants.KEYSETSTRING.length(); j++) {
                 generator = new Random(seed + (i * 3 * (j + 1)));
-                int randNum = generator.nextInt(keyset.length() - 1);
-                keyset = swapIndex(keyset, j, randNum);
+                int randNum = generator.nextInt(Constants.KEYSETSTRING.length() - 1);
+                changedKeyset = swapIndex(Constants.KEYSETSTRING, j, randNum);
             }
         }
-        return keyset;
+        return changedKeyset;
     }
 }
-
