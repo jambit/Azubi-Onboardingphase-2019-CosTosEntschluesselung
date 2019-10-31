@@ -1,6 +1,5 @@
 package com.jambit;
 
-import com.sun.tools.internal.jxc.ap.Const;
 import com.sun.xml.internal.fastinfoset.util.StringArray;
 import java.io.File;
 import java.io.IOException;
@@ -13,13 +12,6 @@ public class UserInterface {
    int seed = 0;
    StringArray decryptedContent;
    StringArray encryptedContent;
-   String pathname;
-   public static String keysetString =
-       "ABCDEFGHIJKLMNOPQRSTUVWXYZÄÜÖabcdefghijklmnopqrstuvwxyzäüöß0123456789,.!?\"§$%&/"
-           +
-           "()" +
-           "=+-*\\_#~<>| ";
-
 
    void startUi() throws IOException {
       Scanner sc = new Scanner(System.in);
@@ -40,6 +32,7 @@ public class UserInterface {
                switch (input) {
                   case "y":
                      encryptWithRandoms(input);
+
                      break;
 
                   case "n":
@@ -95,7 +88,7 @@ public class UserInterface {
       randomKeyAndSeed.setKey(generateRandomKey());
       randomKeyAndSeed.setSeed(generateRandomSeed());
       System.out.println("your seed and key are: " + randomKeyAndSeed.getSeed() + ":" + randomKeyAndSeed.getKey());
-      return encryptionHelper.encrypt(decryptedContent, randomKeyAndSeed.getSeed(), randomKeyAndSeed.getKey());
+      return encryptionHelper.encrypt(decryptedContent, randomKeyAndSeed.getKey(), randomKeyAndSeed.getSeed());
 
    }
 
@@ -190,7 +183,7 @@ public class UserInterface {
    }
 
    void printContent(StringArray content) {
-      // prints out the decrypted text
+      // prints out the content in console
       for (int i = 0; i < content.getSize(); i++) {
          System.out.println(content.get(i));
       }
@@ -210,7 +203,7 @@ public class UserInterface {
 
    private int generateRandomKey() {
       int min = 1;
-      int max = keysetString.length() - 1;
+      int max = Constants.KEYSETSTRING.length() - 1;
       Random r = new Random();
       return r.nextInt((max - min) + 1) + min;
    }
