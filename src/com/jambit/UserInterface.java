@@ -1,5 +1,6 @@
 package com.jambit;
 
+import com.sun.tools.internal.jxc.ap.Const;
 import com.sun.xml.internal.fastinfoset.util.StringArray;
 import java.io.File;
 import java.io.IOException;
@@ -27,21 +28,18 @@ public class UserInterface {
          System.out.println("do you want to encrypt[e] or decrypt[d] the file");
          String input = sc.next();
 
+         //TODO: Handle user input for file path
+         final StringArray decryptedFileContent = readFile(Constants.DEFAULT_DECRYPTED_FILE_PATH);
+         final StringArray encryptedFileContent = readFile(Constants.DEFAULT_ENCRYPTED_FILE_PATH);
          switch (input) {
             case "e":
-               final StringArray decryptedFileContent = readFile(
-                   "DecryptedText.txt");
                System.out
                    .println("do you want to generate a key and seed? [y] [n]");
                input = sc.next();
 
                switch (input) {
                   case "y":
-                     CodecUtility randomKeyAndSeed = splitSeedAndKey(input);
-                     randomKeyAndSeed.setKey(generateRandomKey());
-                     randomKeyAndSeed.setSeed(generateRandomSeed());
-                     System.out.println("your seed and key are: " + randomKeyAndSeed.getSeed() + ":" + randomKeyAndSeed.getKey());
-                     encryptionHelper.encrypt(decryptedContent, randomKeyAndSeed.getSeed(), randomKeyAndSeed.getKey());
+                     encryptWithRandoms(input);
                      break;
 
                   case "n":
@@ -64,42 +62,41 @@ public class UserInterface {
                      break;
                }
 
-               if (checkFile("DecryptedText.txt")) {
-
-                  //todo use encrypt method
-               } else {
-                  System.out.println("please enter a valid path + filename");
-                  pathname = sc.next();
-
-                  while (checkFile(pathname) == false) {
-                     System.out.println("please enter a valid path + filename");
-                     pathname = sc.next();
-                  }
-               }
-               printContent(encryptedContent);
-               writeEncryptedContentInFile(encryptedContent);
+               writeEncryptedContentToFile(encryptedContent);
                break;
 
             case "d":
-               if (checkFile("EncryptedText.txt")) {
-                  enterKeyAndDecrypt();
-               } else {
-                  System.out.println("please enter a valid path + filename");
-                  pathname = sc.next();
+               DecryptionHelper decryptionHelper = new DecryptionHelper();
+               System.out.println("please enter your [seed]:[key]");
 
-                  while (checkFile(pathname) == false) {
-                     System.out.println("please enter a valid path + filename");
-                     pathname = sc.next();
-                  }
+               input = sc.next();
+               CodecUtility seedAndKey = splitSeedAndKey(input);
+
+               if (seedAndKey.getSeed() != 0) { //if seed is supplied
+                  //TODO: decryptedContent not global!
+                  decryptedContent = decryptionHelper.decrypt(encryptedFileContent, seedAndKey.getKey(), seedAndKey.getSeed());
+
+               } else {
+                  decryptedContent = decryptionHelper //if seed is not supplied
+                      .decrypt(decryptedFileContent, seedAndKey.getKey());
                }
-               printContent(decryptedContent);
-               writeDecryptedContentInFile(decryptedContent);
+
                break;
 
             default:
                break;
          }
       }
+   }
+
+   private StringArray encryptWithRandoms(String input) {
+      EncryptionHelper encryptionHelper = new EncryptionHelper();
+      CodecUtility randomKeyAndSeed = splitSeedAndKey(input);
+      randomKeyAndSeed.setKey(generateRandomKey());
+      randomKeyAndSeed.setSeed(generateRandomSeed());
+      System.out.println("your seed and key are: " + randomKeyAndSeed.getSeed() + ":" + randomKeyAndSeed.getKey());
+      return encryptionHelper.encrypt(decryptedContent, randomKeyAndSeed.getSeed(), randomKeyAndSeed.getKey());
+
    }
 
    private StringArray readFile(String s) throws IOException {
@@ -135,7 +132,7 @@ public class UserInterface {
       return codecUtility;
    }
 
-   boolean checkFile(String pathname) {
+   boolean checkFileIfExists(String pathname) {
       boolean fileExists;
       File file = new File(pathname);
       fileExists = file.exists();
@@ -201,14 +198,14 @@ public class UserInterface {
 
    void writeDecryptedContentInFile(StringArray decryptedContent)
        throws IOException {
-      TextOutput textOutput = new TextOutput();
-      textOutput.writeFileDecryptedContend(decryptedContent);
+      CustomFileWriter customFileWriter = new CustomFileWriter();
+      customFileWriter.write(decryptedContent, Constants.DEFAULT_DECRYPTED_FILE_PATH);
    }
 
-   void writeEncryptedContentInFile(StringArray encryptedContent)
+   void writeEncryptedContentToFile(StringArray encryptedContent)
        throws IOException {
-      TextOutput textOutput = new TextOutput();
-      textOutput.writeFileEncryptedContend(encryptedContent);
+      CustomFileWriter customFileWriter = new CustomFileWriter();
+      customFileWriter.write(encryptedContent, Constants.DEFAULT_ENCRYPTED_FILE_PATH);
    }
 
    private int generateRandomKey() {
