@@ -63,6 +63,7 @@ public class UserInterface {
                   default:
                      break;
                }
+
                if (checkFile("DecryptedText.txt")) {
 
                   //todo use encrypt method
