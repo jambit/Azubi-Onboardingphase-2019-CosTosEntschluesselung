@@ -12,6 +12,8 @@ public class UserInterface {
     void startUi() throws IOException {
 
         Scanner sc = new Scanner(System.in);
+        InputReader inputReader = new InputReader();
+
         while (true) {
             System.out.println("do you want to encrypt[e] or decrypt[d] the file");
             String input = sc.next();
@@ -27,33 +29,33 @@ public class UserInterface {
                     switch (input) {
                         case "y":
                             encryptWithRandoms();
+                            inputReader.showContentOfFile(Constants.DEFAULT_ENCRYPTED_FILE_PATH);
                             break;
 
                         case "n":
                             encryptWithoutRandoms();
+                            inputReader.showContentOfFile(Constants.DEFAULT_ENCRYPTED_FILE_PATH);
                             break;
 
                         default:
                             break;
                     }
-                    writeEncryptedContentToFile(encryptedContent);
                     break;
 
                 case "d":
-//                   todo fix everything
-                    System.out.println("please enter your [seed]:[key]");
+                    enterSeedAndKey();
+                    decrypt();
 
-                    input = sc.next();
-                    CodecUtility seedAndKey = splitSeedAndKey(input);
 
-                    if (seedAndKey.getSeed() != 0) { //if seed is supplied
-                        //TODO: decryptedContent not global!
-                        decryptedContent = enDeCryption.decrypt(encryptedFileContent, seedAndKey.getKey(), seedAndKey.getSeed());
-
-                    } else {
-                        decryptedContent = enDeCryption //if seed is not supplied
-                                .decrypt(decryptedFileContent, seedAndKey.getSeed(), seedAndKey.getKey());
-                    }
+//                    if (seedAndKey.getSeed() != 0) { //if seed is supplied
+//                        //TODO: decryptedContent not global!
+//
+//                        decryptedContent = enDeCryption.decrypt(encryptedFileContent, seedAndKey.getKey(), seedAndKey.getSeed());
+//
+//                    } else {
+//                        decryptedContent = enDeCryption //if seed is not supplied
+//                                .decrypt(decryptedFileContent, seedAndKey.getSeed(), seedAndKey.getKey());
+//                    }
                     break;
 
                 default:
@@ -61,6 +63,7 @@ public class UserInterface {
             }
         }
     }
+
 
     private void encryptWithoutRandoms() throws IOException {
         Scanner sc = new Scanner(System.in);
@@ -74,12 +77,21 @@ public class UserInterface {
 
     private void encryptWithRandoms() throws IOException {
         CodecUtility codecUtility = new CodecUtility();
-        CodecUtility randomKeyAndSeed = null;
-        randomKeyAndSeed.setKey(generateRandomKey());
-        randomKeyAndSeed.setSeed(generateRandomSeed());
-        System.out.println("your seed and key are: " + randomKeyAndSeed.getSeed() + ":" + randomKeyAndSeed.getKey());
+
+        //todo understand what we did here
+//        CodecUtility randomKeyAndSeed = null;  //why = null??
+//        randomKeyAndSeed.setKey(generateRandomKey());
+//        randomKeyAndSeed.setSeed(generateRandomSeed());
+//        System.out.println("your seed and key are: " + randomKeyAndSeed.getSeed() + ":" + randomKeyAndSeed.getKey());
+//        int seed = codecUtility.getSeed();
+//        int key = codecUtility.getKey();
+
+        codecUtility.setKey(generateRandomKey());
+        codecUtility.setSeed(generateRandomSeed());
+        System.out.println("your seed and key are: " + codecUtility.getSeed() + ":" + codecUtility.getKey());
         int seed = codecUtility.getSeed();
         int key = codecUtility.getKey();
+
         encryptFromToWithSeedAndKey(Constants.DEFAULT_DECRYPTED_FILE_PATH, Constants.DEFAULT_ENCRYPTED_FILE_PATH, seed, key);
     }
 
@@ -90,27 +102,40 @@ public class UserInterface {
         outputWriter.writeFile(enDeCryption.encrypt(inputReader.readFile(pathFrom), key, seed), pathTo);
     }
 
+    private void decrypt() throws IOException {
+        CodecUtility codecUtility = new CodecUtility();
+        InputReader inputReader = new InputReader();
+        decryptFromToWithSeedAndKey(Constants.DEFAULT_ENCRYPTED_FILE_PATH,
+                Constants.DEFAULT_DECRYPTED_FILE_PATH, codecUtility.getSeed(), codecUtility.getKey());
+
+        inputReader.showContentOfFile(Constants.DEFAULT_DECRYPTED_FILE_PATH);
+    }
+
+    //todo bugfix the decrypted content doesnt get saved in the DecryptedText.txt but the encrypted content does
+    private void decryptFromToWithSeedAndKey(String pathFrom, String pathTo, int seed, int key) throws IOException {
+        InputReader inputReader = new InputReader();
+        OutputWriter outputWriter = new OutputWriter();
+        EnDeCryption enDeCryption = new EnDeCryption();
+        outputWriter.writeFile(enDeCryption.decrypt(inputReader.readFile(pathFrom), key, seed), pathTo);
+    }
+
 
     private StringArray readFile(String filePath) throws IOException {
         InputReader inputReader = new InputReader();
         return inputReader.readFile(filePath);
     }
 
-    private StringArray printSeedMenue() throws IOException {
+    private void enterSeedAndKey() {
         Scanner sc = new Scanner(System.in);
-        InputReader inputReader = new InputReader();
-
         System.out.println("please enter your [seed]:[key]");
-
-        //Todo: Extract to METHOD
-        final StringArray decryptedFileContent = inputReader.readFile("DecryptedText.txt");
-        return decryptedFileContent;
+        String input = sc.next();
+        splitSeedAndKey(input);
     }
 
     private CodecUtility splitSeedAndKey(String keyString) {
         String[] keyAndSeed = keyString.split(":");
         CodecUtility codecUtility = new CodecUtility();
-//todo check if it works
+        //todo check if it works
         try {
             if (keyAndSeed.length == 2) {
                 codecUtility.setKey(Integer.parseInt(keyAndSeed[1]));
@@ -122,13 +147,37 @@ public class UserInterface {
         return codecUtility;
     }
 
+    private int generateRandomKey() {
+        int min = 1;
+        int max = Constants.KEYSETSTRING.length() - 1;
+        Random r = new Random();
+        return r.nextInt((max - min) + 1) + min;
+    }
+
+    private int generateRandomSeed() {
+        int max = 2147483646;
+        Random r = new Random();
+        return r.nextInt(max) + 1;
+    }
+
+    //todo still needed? if not remove it
+    private StringArray printSeedMenue() throws IOException {
+        Scanner sc = new Scanner(System.in);
+        InputReader inputReader = new InputReader();
+
+        System.out.println("please enter your [seed]:[key]");
+
+        //Todo: Extract to METHOD
+        final StringArray decryptedFileContent = inputReader.readFile("DecryptedText.txt");
+        return decryptedFileContent;
+    }
+
     boolean checkFileIfExists(String pathname) {
         boolean fileExists;
         File file = new File(pathname);
         fileExists = file.exists();
         return fileExists;
     }
-
 
     void printContent(StringArray content) {
         // prints out the content in console
@@ -147,20 +196,6 @@ public class UserInterface {
             throws IOException {
         CustomFileWriter customFileWriter = new CustomFileWriter();
         customFileWriter.write(encryptedContent, Constants.DEFAULT_ENCRYPTED_FILE_PATH);
-    }
-
-    private int generateRandomKey() {
-        int min = 1;
-        int max = Constants.KEYSETSTRING.length() - 1;
-        Random r = new Random();
-        return r.nextInt((max - min) + 1) + min;
-    }
-
-    private int generateRandomSeed() {
-        int min = -2147483648;
-        int max = 2147483647;
-        Random r = new Random();
-        return r.nextInt((max - min) + 1) + min;
     }
 
 
