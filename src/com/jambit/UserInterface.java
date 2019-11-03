@@ -164,7 +164,7 @@ public class UserInterface {
         return r.nextInt(max) + 1;
     }
 
-    //todo still needed? if not remove it
+    //TODO: remove redundant code
     private StringArray printSeedMenue() throws IOException {
         Scanner sc = new Scanner(System.in);
         InputReader inputReader = new InputReader();
