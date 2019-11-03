@@ -16,12 +16,13 @@ public class UserInterface {
         //TODO: Handle user input for file path (change default file path)
 
         while (true) {
-            System.out.println("do you want to encrypt[e] or decrypt[d] the file");
+            System.out.println("do you want to encrypt[e] or decrypt[d] the file\n");
             String input = sc.next();
+            System.out.println();
 
             switch (input) {
                 case "e":
-                    System.out.println("do you want to generate a key and seed? [y] [n]");
+                    System.out.println("do you want to generate a key and seed? [y] [n]\n");
                     input = sc.next();
 
                     switch (input) {
@@ -48,6 +49,7 @@ public class UserInterface {
                     String seedAndKeyInput = enterSeedAndKey();
                     decrypt(splitSeedAndKey(seedAndKeyInput));
                     inputReader.showContentOfFile(Constants.DEFAULT_DECRYPTED_FILE_PATH);
+                    System.out.println();
                     break;
 
                 default:
@@ -59,7 +61,7 @@ public class UserInterface {
 
     private void encryptWithoutRandoms() throws IOException {
         Scanner sc = new Scanner(System.in);
-        System.out.println("please enter your [seed]:[key]");
+        System.out.println("please enter your [seed]:[key]\n");
         String input = sc.next();
         CodecUtility seedAndKey = splitSeedAndKey(input);
         int seed = seedAndKey.getSeed();
@@ -83,7 +85,6 @@ public class UserInterface {
         System.out.println("\nyour seed and key are: " + codecUtility.getSeed() + ":" + codecUtility.getKey()+"\n");
         int seed = codecUtility.getSeed();
         int key = codecUtility.getKey();
-
         encryptFromToWithSeedAndKey(Constants.DEFAULT_DECRYPTED_FILE_PATH, Constants.DEFAULT_ENCRYPTED_FILE_PATH, seed, key);
     }
 
@@ -110,6 +111,7 @@ public class UserInterface {
         Scanner sc = new Scanner(System.in);
         System.out.println("please enter your [seed]:[key]");
         String input = sc.next();
+        System.out.println();
         return input;
     }
 
