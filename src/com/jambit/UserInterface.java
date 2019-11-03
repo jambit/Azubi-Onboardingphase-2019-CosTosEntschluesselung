@@ -13,16 +13,11 @@ public class UserInterface {
 
         Scanner sc = new Scanner(System.in);
         InputReader inputReader = new InputReader();
+        //TODO: Handle user input for file path (change default file path)
 
         while (true) {
             System.out.println("do you want to encrypt[e] or decrypt[d] the file");
             String input = sc.next();
-
-            //TODO: Handle user input for file path
-
-            //TODO: remove?
-//            final StringArray decryptedFileContent = readFile(Constants.DEFAULT_DECRYPTED_FILE_PATH);
-//            final StringArray encryptedFileContent = readFile(Constants.DEFAULT_ENCRYPTED_FILE_PATH);
 
             switch (input) {
                 case "e":
@@ -32,12 +27,16 @@ public class UserInterface {
                     switch (input) {
                         case "y":
                             encryptWithRandoms();
+                            System.out.println("your encrypted text:\n");
                             inputReader.showContentOfFile(Constants.DEFAULT_ENCRYPTED_FILE_PATH);
+                            System.out.println();
                             break;
 
                         case "n":
                             encryptWithoutRandoms();
+                            System.out.println("your encrypted text:\n");
                             inputReader.showContentOfFile(Constants.DEFAULT_ENCRYPTED_FILE_PATH);
+                            System.out.println();
                             break;
 
                         default:
@@ -46,8 +45,9 @@ public class UserInterface {
                     break;
 
                 case "d":
-                    enterSeedAndKey();
-                    decrypt();
+                    String seedAndKeyInput = enterSeedAndKey();
+                    decrypt(splitSeedAndKey(seedAndKeyInput));
+                    inputReader.showContentOfFile(Constants.DEFAULT_DECRYPTED_FILE_PATH);
                     break;
 
                 default:
@@ -80,7 +80,7 @@ public class UserInterface {
 
         codecUtility.setKey(generateRandomKey());
         codecUtility.setSeed(generateRandomSeed());
-        System.out.println("your seed and key are: " + codecUtility.getSeed() + ":" + codecUtility.getKey());
+        System.out.println("\nyour seed and key are: " + codecUtility.getSeed() + ":" + codecUtility.getKey()+"\n");
         int seed = codecUtility.getSeed();
         int key = codecUtility.getKey();
 
@@ -94,15 +94,9 @@ public class UserInterface {
         outputWriter.writeFile(enDeCryption.encrypt(inputReader.readFile(pathFrom), key, seed), pathTo);
     }
 
-    private void decrypt() throws IOException {
-        //TODO change codecUtility.getSeed() and codecUtility.getKey() that it doesnt need a new created object
-        // because is needs the values of key and seed which were set in splitSeedAndKey()
-        CodecUtility codecUtility = new CodecUtility();
-        InputReader inputReader = new InputReader();
+    private void decrypt(CodecUtility codecUtility) throws IOException {
         decryptFromToWithSeedAndKey(Constants.DEFAULT_ENCRYPTED_FILE_PATH,
                 Constants.DEFAULT_DECRYPTED_FILE_PATH, codecUtility.getSeed(), codecUtility.getKey());
-
-        inputReader.showContentOfFile(Constants.DEFAULT_DECRYPTED_FILE_PATH);
     }
 
     private void decryptFromToWithSeedAndKey(String pathFrom, String pathTo, int seed, int key) throws IOException {
@@ -112,26 +106,11 @@ public class UserInterface {
         outputWriter.writeFile(enDeCryption.decrypt(inputReader.readFile(pathFrom), key, seed), pathTo);
     }
 
-
-    private StringArray readFile(String filePath) throws IOException {
-        InputReader inputReader = new InputReader();
-        return inputReader.readFile(filePath);
-    }
-
-    private CodecUtility enterSeedAndKey() {
+    private String enterSeedAndKey() {
         Scanner sc = new Scanner(System.in);
         System.out.println("please enter your [seed]:[key]");
-
-        //TODO: remove redundant code
-//        sc.next();
-//        splitSeedAndKey(sc.next());
-
-//        String input = sc.next();
-//        splitSeedAndKey(input);
-
         String input = sc.next();
-        CodecUtility seedAndKey = splitSeedAndKey(input);
-        return seedAndKey;
+        return input;
     }
 
     private CodecUtility splitSeedAndKey(String keyString) {
@@ -146,7 +125,7 @@ public class UserInterface {
                 codecUtility.setKey(Integer.parseInt(keyAndSeed[0]));
             }
         } catch (NumberFormatException e) {
-            System.err.println("invalid seed & key format");
+            System.err.println("\ninvalid seed & key format");
         }
         return codecUtility;
     }
@@ -164,7 +143,16 @@ public class UserInterface {
         return r.nextInt(max) + 1;
     }
 
+
+
+
     //TODO: remove redundant code
+
+    private StringArray readFile(String filePath) throws IOException {
+        InputReader inputReader = new InputReader();
+        return inputReader.readFile(filePath);
+    }
+
     private StringArray printSeedMenue() throws IOException {
         Scanner sc = new Scanner(System.in);
         InputReader inputReader = new InputReader();
@@ -201,6 +189,4 @@ public class UserInterface {
         CustomFileWriter customFileWriter = new CustomFileWriter();
         customFileWriter.write(encryptedContent, Constants.DEFAULT_ENCRYPTED_FILE_PATH);
     }
-
-
 }
