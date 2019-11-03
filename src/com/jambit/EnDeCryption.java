@@ -23,21 +23,18 @@ public class EnDeCryption {
     }
 
     public String decrypt(String encryptedLine, int key ,String keyset) {
-
-        int keysetLength = keyset.length();
-        int lineLength = encryptedLine.length();
         int charLocationInKeyset;
         int lookAtKeysetPos;
         char decryptedChar;
         String decryptedLine = "";
 
-        for (int i = 0; i < lineLength; i++) {
+        for (int i = 0; i < encryptedLine.length(); i++) {
             char currentChar = encryptedLine.charAt(i);
             charLocationInKeyset = keyset.indexOf(currentChar);
             lookAtKeysetPos = charLocationInKeyset - key;
 
             if (lookAtKeysetPos < 0) {
-                lookAtKeysetPos = lookAtKeysetPos + keysetLength;
+                lookAtKeysetPos = lookAtKeysetPos + keyset.length();
             }
             decryptedChar = keyset.charAt(lookAtKeysetPos);
             decryptedLine = decryptedLine + decryptedChar;
@@ -63,20 +60,18 @@ public class EnDeCryption {
     }
 
     String encrypt(String decryptedLine, int key, String keyset) {
-        int keysetLength = keyset.length();
-        int lineLength = decryptedLine.length();
         int charLocationInKeyset;
         int lookAtKeysetPos;
         char encryptedChar;
         String encryptedLine = "";
 
-        for (int i = 0; i < lineLength; i++) {
+        for (int i = 0; i < decryptedLine.length(); i++) {
             char currentChar = decryptedLine.charAt(i);
             charLocationInKeyset = keyset.indexOf(currentChar);
             lookAtKeysetPos = charLocationInKeyset + key;
 
-            if (lookAtKeysetPos + 1 > keysetLength) {
-                lookAtKeysetPos = lookAtKeysetPos - keysetLength;
+            if (lookAtKeysetPos + 1 > keyset.length()) {
+                lookAtKeysetPos = lookAtKeysetPos - keyset.length();
             }
             encryptedChar = keyset.charAt(lookAtKeysetPos);
             encryptedLine = encryptedLine + encryptedChar;
