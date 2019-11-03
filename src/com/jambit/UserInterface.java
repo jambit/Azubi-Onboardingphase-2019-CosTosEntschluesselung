@@ -19,8 +19,11 @@ public class UserInterface {
             String input = sc.next();
 
             //TODO: Handle user input for file path
-            final StringArray decryptedFileContent = readFile(Constants.DEFAULT_DECRYPTED_FILE_PATH);
-            final StringArray encryptedFileContent = readFile(Constants.DEFAULT_ENCRYPTED_FILE_PATH);
+
+            //TODO: remove?
+//            final StringArray decryptedFileContent = readFile(Constants.DEFAULT_DECRYPTED_FILE_PATH);
+//            final StringArray encryptedFileContent = readFile(Constants.DEFAULT_ENCRYPTED_FILE_PATH);
+
             switch (input) {
                 case "e":
                     System.out.println("do you want to generate a key and seed? [y] [n]");
@@ -45,17 +48,6 @@ public class UserInterface {
                 case "d":
                     enterSeedAndKey();
                     decrypt();
-
-
-//                    if (seedAndKey.getSeed() != 0) { //if seed is supplied
-//                        //TODO: decryptedContent not global!
-//
-//                        decryptedContent = enDeCryption.decrypt(encryptedFileContent, seedAndKey.getKey(), seedAndKey.getSeed());
-//
-//                    } else {
-//                        decryptedContent = enDeCryption //if seed is not supplied
-//                                .decrypt(decryptedFileContent, seedAndKey.getSeed(), seedAndKey.getKey());
-//                    }
                     break;
 
                 default:
@@ -103,6 +95,8 @@ public class UserInterface {
     }
 
     private void decrypt() throws IOException {
+        //TODO change codecUtility.getSeed() and codecUtility.getKey() that it doesnt need a new created object
+        // because is needs the values of key and seed which were set in splitSeedAndKey()
         CodecUtility codecUtility = new CodecUtility();
         InputReader inputReader = new InputReader();
         decryptFromToWithSeedAndKey(Constants.DEFAULT_ENCRYPTED_FILE_PATH,
@@ -111,7 +105,6 @@ public class UserInterface {
         inputReader.showContentOfFile(Constants.DEFAULT_DECRYPTED_FILE_PATH);
     }
 
-    //todo bugfix the decrypted content doesnt get saved in the DecryptedText.txt but the encrypted content does
     private void decryptFromToWithSeedAndKey(String pathFrom, String pathTo, int seed, int key) throws IOException {
         InputReader inputReader = new InputReader();
         OutputWriter outputWriter = new OutputWriter();
@@ -125,11 +118,20 @@ public class UserInterface {
         return inputReader.readFile(filePath);
     }
 
-    private void enterSeedAndKey() {
+    private CodecUtility enterSeedAndKey() {
         Scanner sc = new Scanner(System.in);
         System.out.println("please enter your [seed]:[key]");
+
+        //TODO: remove redundant code
+//        sc.next();
+//        splitSeedAndKey(sc.next());
+
+//        String input = sc.next();
+//        splitSeedAndKey(input);
+
         String input = sc.next();
-        splitSeedAndKey(input);
+        CodecUtility seedAndKey = splitSeedAndKey(input);
+        return seedAndKey;
     }
 
     private CodecUtility splitSeedAndKey(String keyString) {
@@ -140,6 +142,8 @@ public class UserInterface {
             if (keyAndSeed.length == 2) {
                 codecUtility.setKey(Integer.parseInt(keyAndSeed[1]));
                 codecUtility.setSeed(Integer.parseInt(keyAndSeed[0]));
+            } else if (keyAndSeed.length == 1) {
+                codecUtility.setKey(Integer.parseInt(keyAndSeed[0]));
             }
         } catch (NumberFormatException e) {
             System.err.println("invalid seed & key format");
