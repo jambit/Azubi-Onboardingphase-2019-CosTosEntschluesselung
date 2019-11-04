@@ -5,7 +5,13 @@ import java.util.Random;
 
 public class EnDeCryption {
 
-
+    /**
+     * decrypts the consigned encrypted StringArray with the consigned seed and key and returns it as a StringArray
+     * @param encryptedContent input content (StringArray)
+     * @param key the key needed for decryption
+     * @param seed the seed needed for the decryption
+     * @return the decrypted content and returns it as a StringArray
+     */
     StringArray decrypt(StringArray encryptedContent, int key, int seed) {
         String keyset = Constants.KEYSETSTRING;
         if(seed != 0){
@@ -42,7 +48,13 @@ public class EnDeCryption {
         return decryptedLine;
     }
 
-
+    /**
+     * encrypts the consigned decrypted StringArray with the consigned seed and key and returns it as a StringArray
+     * @param decryptedContent input content (StringArray)
+     * @param key the key needed for decryption
+     * @param seed the seed needed for decryption
+     * @return the encrypted content and returns it as a StringArray
+     */
     StringArray encrypt(StringArray decryptedContent, int key, int seed) {
         String keyset = Constants.KEYSETSTRING;
         if(seed != 0){
