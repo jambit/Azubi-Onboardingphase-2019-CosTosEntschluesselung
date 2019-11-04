@@ -4,91 +4,52 @@ import com.sun.xml.internal.fastinfoset.util.StringArray;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Random;
 import java.util.Scanner;
 
 public class UserInterface {
-    int key;
-    int seed = 0;
-    StringArray decryptedContent;
-    StringArray encryptedContent;
-    String pathname;
-    public static String keysetString = "ABCDEFGHIJKLMNOPQRSTUVWXYZÄÜÖabcdefghijklmnopqrstuvwxyzäüöß0123456789,.!?\"§$%&/" +
-            "()" +
-            "=+-*\\_#~<>| ";
-
 
     void startUi() throws IOException {
+
         Scanner sc = new Scanner(System.in);
+        InputReader inputReader = new InputReader();
+        //TODO: Handle user input for file path (change default file path)
+
         while (true) {
-            System.out.println("do you want to encrypt[e] or decrypt[d] the file");
+            System.out.println("do you want to encrypt[e] or decrypt[d] the file\n");
             String input = sc.next();
+            System.out.println();
+
             switch (input) {
                 case "e":
-                    System.out.println("do you want to generate a key and seed? [y] [n]");
-                    String doYou = sc.next();
-                    switch (doYou) {
+                    System.out.println("do you want to generate a key and seed? [y] [n]\n");
+                    input = sc.next();
+
+                    switch (input) {
                         case "y":
-                            //todo add a random generator for seed and key
+                            encryptWithRandoms();
+                            System.out.println("your encrypted text:\n");
+                            inputReader.showContentOfFile(Constants.DEFAULT_ENCRYPTED_FILE_PATH);
+                            System.out.println();
                             break;
 
                         case "n":
-                            System.out.println("please enter your [seed]:[key]");
-                            InputReader inputReader = new InputReader();
-                            final StringArray decryptedFileContent = inputReader.readFile("DecryptedText.txt");
-                            System.out.println("enter the decryption key:");
-
-                            String keyString = sc.next();
-                            String[] keyAndSeed = keyString.split(":");
-
-                            if (keyAndSeed.length == 2) {
-                                key = Integer.parseInt(keyAndSeed[1]);
-                                seed = Integer.parseInt(keyAndSeed[0]);
-                            } else {
-                                key = Integer.parseInt(keyAndSeed[0]);
-                            }
-
-                            EncryptionHelper encryptionHelper = new EncryptionHelper();
-                            if (seed != 0) {
-                                encryptedContent = encryptionHelper.encrypt(decryptedFileContent, key, seed);
-
-                            } else {
-                                encryptedContent = encryptionHelper.encrypt(decryptedFileContent, key);
-                            }
+                            encryptWithoutRandoms();
+                            System.out.println("your encrypted text:\n");
+                            inputReader.showContentOfFile(Constants.DEFAULT_ENCRYPTED_FILE_PATH);
+                            System.out.println();
                             break;
 
                         default:
                             break;
                     }
-                    if (checkFile("DecryptedText.txt")) {
-
-                        //todo use encrypt method
-                    } else {
-                        System.out.println("please enter a valid path + filename");
-                        pathname = sc.next();
-
-                        while (checkFile(pathname) == false) {
-                            System.out.println("please enter a valid path + filename");
-                            pathname = sc.next();
-                        }
-                    }
-                    printContend(encryptedContent);
-                    writeEncryptedContentInFile(encryptedContent);
                     break;
 
                 case "d":
-                    if (checkFile("EncryptedText.txt")) {
-                        enterKeyAndDecrypt();
-                    } else {
-                        System.out.println("please enter a valid path + filename");
-                        pathname = sc.next();
-
-                        while (checkFile(pathname) == false) {
-                            System.out.println("please enter a valid path + filename");
-                            pathname = sc.next();
-                        }
-                    }
-                    printContend(decryptedContent);
-                    writeDecryptedContentInFile(decryptedContent);
+                    String seedAndKeyInput = enterSeedAndKey();
+                    decrypt(splitSeedAndKey(seedAndKeyInput));
+                    inputReader.showContentOfFile(Constants.DEFAULT_DECRYPTED_FILE_PATH);
+                    System.out.println();
                     break;
 
                 default:
@@ -97,78 +58,137 @@ public class UserInterface {
         }
     }
 
-    boolean checkFile(String pathname) {
+
+    private void encryptWithoutRandoms() throws IOException {
+        Scanner sc = new Scanner(System.in);
+        System.out.println("please enter your [seed]:[key]\n");
+        String input = sc.next();
+        CodecUtility seedAndKey = splitSeedAndKey(input);
+        int seed = seedAndKey.getSeed();
+        int key = seedAndKey.getKey();
+        encryptFromToWithSeedAndKey(Constants.DEFAULT_DECRYPTED_FILE_PATH, Constants.DEFAULT_ENCRYPTED_FILE_PATH, seed, key);
+    }
+
+    private void encryptWithRandoms() throws IOException {
+        CodecUtility codecUtility = new CodecUtility();
+
+        //todo understand what we did here
+//        CodecUtility randomKeyAndSeed = null;  //why = null??
+//        randomKeyAndSeed.setKey(generateRandomKey());
+//        randomKeyAndSeed.setSeed(generateRandomSeed());
+//        System.out.println("your seed and key are: " + randomKeyAndSeed.getSeed() + ":" + randomKeyAndSeed.getKey());
+//        int seed = codecUtility.getSeed();
+//        int key = codecUtility.getKey();
+
+        codecUtility.setKey(generateRandomKey());
+        codecUtility.setSeed(generateRandomSeed());
+        System.out.println("\nyour seed and key are: " + codecUtility.getSeed() + ":" + codecUtility.getKey()+"\n");
+        int seed = codecUtility.getSeed();
+        int key = codecUtility.getKey();
+        encryptFromToWithSeedAndKey(Constants.DEFAULT_DECRYPTED_FILE_PATH, Constants.DEFAULT_ENCRYPTED_FILE_PATH, seed, key);
+    }
+
+    private void encryptFromToWithSeedAndKey(String pathFrom, String pathTo, int seed, int key) throws IOException {
+        InputReader inputReader = new InputReader();
+        OutputWriter outputWriter = new OutputWriter();
+        EnDeCryption enDeCryption = new EnDeCryption();
+        outputWriter.writeFile(enDeCryption.encrypt(inputReader.readFile(pathFrom), key, seed), pathTo);
+    }
+
+    private void decrypt(CodecUtility codecUtility) throws IOException {
+        decryptFromToWithSeedAndKey(Constants.DEFAULT_ENCRYPTED_FILE_PATH,
+                Constants.DEFAULT_DECRYPTED_FILE_PATH, codecUtility.getSeed(), codecUtility.getKey());
+    }
+
+    private void decryptFromToWithSeedAndKey(String pathFrom, String pathTo, int seed, int key) throws IOException {
+        InputReader inputReader = new InputReader();
+        OutputWriter outputWriter = new OutputWriter();
+        EnDeCryption enDeCryption = new EnDeCryption();
+        outputWriter.writeFile(enDeCryption.decrypt(inputReader.readFile(pathFrom), key, seed), pathTo);
+    }
+
+    private String enterSeedAndKey() {
+        Scanner sc = new Scanner(System.in);
+        System.out.println("please enter your [seed]:[key]");
+        String input = sc.next();
+        System.out.println();
+        return input;
+    }
+
+    private CodecUtility splitSeedAndKey(String keyString) {
+        String[] keyAndSeed = keyString.split(":");
+        CodecUtility codecUtility = new CodecUtility();
+        //todo check if it works
+        try {
+            if (keyAndSeed.length == 2) {
+                codecUtility.setKey(Integer.parseInt(keyAndSeed[1]));
+                codecUtility.setSeed(Integer.parseInt(keyAndSeed[0]));
+            } else if (keyAndSeed.length == 1) {
+                codecUtility.setKey(Integer.parseInt(keyAndSeed[0]));
+            }
+        } catch (NumberFormatException e) {
+            System.err.println("\ninvalid seed & key format");
+        }
+        return codecUtility;
+    }
+
+    private int generateRandomKey() {
+        int min = 1;
+        int max = Constants.KEYSETSTRING.length() - 1;
+        Random r = new Random();
+        return r.nextInt((max - min) + 1) + min;
+    }
+
+    private int generateRandomSeed() {
+        int max = 2147483646;
+        Random r = new Random();
+        return r.nextInt(max) + 1;
+    }
+
+
+
+
+    //TODO: remove redundant code
+
+    private StringArray readFile(String filePath) throws IOException {
+        InputReader inputReader = new InputReader();
+        return inputReader.readFile(filePath);
+    }
+
+    private StringArray printSeedMenue() throws IOException {
+        Scanner sc = new Scanner(System.in);
+        InputReader inputReader = new InputReader();
+
+        System.out.println("please enter your [seed]:[key]");
+
+        //Todo: Extract to METHOD
+        final StringArray decryptedFileContent = inputReader.readFile("DecryptedText.txt");
+        return decryptedFileContent;
+    }
+
+    boolean checkFileIfExists(String pathname) {
         boolean fileExists;
         File file = new File(pathname);
         fileExists = file.exists();
         return fileExists;
     }
 
-    void enterKeyAndEncrypt() throws IOException {
-        InputReader inputReader = new InputReader();
-        final StringArray decryptedFileContent = inputReader.readFile("DecryptedText.txt");
-        System.out.println("enter the decryption key:");
-        Scanner scanner = new Scanner(System.in);
-        String keyString = scanner.next();
-        String[] keyAndSeed = keyString.split(":");
-
-        if (keyAndSeed.length == 2) {
-            key = Integer.parseInt(keyAndSeed[1]);
-            seed = Integer.parseInt(keyAndSeed[0]);
-        } else {
-            key = Integer.parseInt(keyAndSeed[0]);
-        }
-
-        EncryptionHelper encryptionHelper = new EncryptionHelper();
-        if (seed != 0) {
-            encryptedContent = encryptionHelper.encrypt(decryptedFileContent, key, seed);
-
-        } else {
-            encryptedContent = encryptionHelper.encrypt(decryptedFileContent, key);
-        }
-    }
-
-    void enterKeyAndDecrypt() throws IOException {
-
-        InputReader inputReader = new InputReader();
-        final StringArray encryptedFileContent = inputReader.readFile("EncryptedText.txt");
-
-        System.out.println("enter a key (format: 12345:67 or just 67):");
-        Scanner scanner = new Scanner(System.in);
-        String keyString = scanner.next();
-        String[] keyAndSeed = keyString.split(":");
-
-        if (keyAndSeed.length == 2) {
-            key = Integer.parseInt(keyAndSeed[1]);
-            seed = Integer.parseInt(keyAndSeed[0]);
-        } else {
-            key = Integer.parseInt(keyAndSeed[0]);
-        }
-
-        DecryptionHelper decryptionHelper = new DecryptionHelper();
-
-        if (seed != 0) {
-            decryptedContent = decryptionHelper.decrypt(encryptedFileContent, key,
-                    seed);
-        } else {
-            decryptedContent = decryptionHelper.decrypt(encryptedFileContent, key);
-        }
-    }
-
-    void printContend(StringArray content) {
-        // prints out the decrypted text
+    void printContent(StringArray content) {
+        // prints out the content in console
         for (int i = 0; i < content.getSize(); i++) {
             System.out.println(content.get(i));
         }
     }
 
-    void writeDecryptedContentInFile(StringArray decryptedContent) throws IOException {
-        TextOutput textOutput = new TextOutput();
-        textOutput.writeFileDecryptedContend(decryptedContent);
+    void writeDecryptedContentInFile(StringArray decryptedContent)
+            throws IOException {
+        CustomFileWriter customFileWriter = new CustomFileWriter();
+        customFileWriter.write(decryptedContent, Constants.DEFAULT_DECRYPTED_FILE_PATH);
     }
 
-    void writeEncryptedContentInFile(StringArray encryptedContent) throws IOException {
-        TextOutput textOutput = new TextOutput();
-        textOutput.writeFileEncryptedContend(encryptedContent);
+    void writeEncryptedContentToFile(StringArray encryptedContent)
+            throws IOException {
+        CustomFileWriter customFileWriter = new CustomFileWriter();
+        customFileWriter.write(encryptedContent, Constants.DEFAULT_ENCRYPTED_FILE_PATH);
     }
 }
