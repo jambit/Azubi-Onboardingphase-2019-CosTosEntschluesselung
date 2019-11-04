@@ -27,6 +27,24 @@ public class InputReader {
         return content;
     }
 
+     public void showContentOfFile(String fileName) throws IOException {
+
+        FileReader fr = new FileReader(fileName);
+        BufferedReader br = new BufferedReader(fr);
+        String line;
+
+        do {
+            line = br.readLine();
+            if (line != null) {
+                System.out.println(line);
+            }
+        }
+        while (line != null);
+        br.close();
+    }
+
+
+    //todo remove method
     StringArray readFile() throws IOException {
 
         FileReader fr = new FileReader("EncryptedText.txt");
