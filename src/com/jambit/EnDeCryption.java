@@ -1,20 +1,22 @@
 package com.jambit;
 
 import com.sun.xml.internal.fastinfoset.util.StringArray;
+
 import java.util.Random;
 
 public class EnDeCryption {
 
     /**
      * decrypts the consigned encrypted StringArray with the consigned seed and key and returns it as a StringArray
+     *
      * @param encryptedContent input content (StringArray)
-     * @param key the key needed for decryption
-     * @param seed the seed needed for the decryption
+     * @param key              the key needed for decryption
+     * @param seed             the seed needed for the decryption
      * @return the decrypted content and returns it as a StringArray
      */
     StringArray decrypt(StringArray encryptedContent, int key, int seed) {
         String keyset = Constants.KEYSETSTRING;
-        if(seed != 0){
+        if (seed != 0) {
             keyset = randomGenerator(seed);
         }
         StringArray decryptedContent = new StringArray();
@@ -28,7 +30,15 @@ public class EnDeCryption {
         return decryptedContent;
     }
 
-    public String decrypt(String encryptedLine, int key ,String keyset) {
+    /**
+     * decrypts a single String with a given key, seed and keyset
+     *
+     * @param encryptedLine the String which gets decrypted
+     * @param key           the key which is used to decrypt the String
+     * @param keyset        the seed which is used to decrypt the String
+     * @return
+     */
+    private String decrypt(String encryptedLine, int key, String keyset) {
         int charLocationInKeyset;
         int lookAtKeysetPos;
         char decryptedChar;
@@ -50,28 +60,29 @@ public class EnDeCryption {
 
     /**
      * encrypts the consigned decrypted StringArray with the consigned seed and key and returns it as a StringArray
+     *
      * @param decryptedContent input content (StringArray)
-     * @param key the key needed for decryption
-     * @param seed the seed needed for decryption
+     * @param key              the key needed for decryption
+     * @param seed             the seed needed for decryption
      * @return the encrypted content and returns it as a StringArray
      */
     StringArray encrypt(StringArray decryptedContent, int key, int seed) {
         String keyset = Constants.KEYSETSTRING;
-        if(seed != 0){
+        if (seed != 0) {
             keyset = randomGenerator(seed);
         }
         StringArray encryptedContent = new StringArray();
         String[] completeArray = decryptedContent.getArray();
         for (int i = 0; i < completeArray.length; i++) {
             if (completeArray[i] != null) {
-                String encryptedMessage = encrypt(completeArray[i], key ,keyset);
+                String encryptedMessage = encrypt(completeArray[i], key, keyset);
                 encryptedContent.add(String.valueOf(encryptedMessage));
             }
         }
         return encryptedContent;
     }
 
-    String encrypt(String decryptedLine, int key, String keyset) {
+    private String encrypt(String decryptedLine, int key, String keyset) {
         int charLocationInKeyset;
         int lookAtKeysetPos;
         char encryptedChar;
@@ -93,6 +104,7 @@ public class EnDeCryption {
 
     /**
      * Swap 2 indexes in a string
+     *
      * @param str string to swap string
      * @param i1  index1
      * @param i2  index2
@@ -107,6 +119,7 @@ public class EnDeCryption {
 
     /**
      * Randomizes the character set
+     *
      * @param seed seed to use for the randomization
      */
     public String randomGenerator(int seed) {

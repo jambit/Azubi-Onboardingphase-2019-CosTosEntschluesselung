@@ -6,6 +6,13 @@ import java.io.*;
 
 public class OutputWriter {
 
+    /**
+     * saves the given content in the given file (and removes the previous content)
+     *
+     * @param content the content which gets saved in the .txt file
+     * @param path    the path & filename of the file in which the content should be saved
+     * @throws IOException
+     */
     public void writeFile(StringArray content, String path) throws IOException {
         FileWriter fw = new FileWriter(path, true);
         BufferedWriter bw = new BufferedWriter(fw);
@@ -23,6 +30,11 @@ public class OutputWriter {
         }
     }
 
+    /**
+     * deletes all content of a .txt file
+     *
+     * @param filePath the path of the file
+     */
     public void clearFile(String filePath) {
 
         try {
@@ -34,32 +46,5 @@ public class OutputWriter {
 
         }
 
-//        FileWriter fw = new FileWriter(filePath, true);
-//        BufferedWriter bw = new BufferedWriter(fw);
-//        BufferedReader br = new BufferedReader(new FileReader(filePath));
-//
-//        while (br != null) {
-//            bw.append(null);
-//            bw.newLine();
-//        }
-//        bw.close();
     }
-
-    public void addToFile(StringArray content, String path) throws IOException {
-        FileWriter fw = new FileWriter(path, true);
-        BufferedWriter bw = new BufferedWriter(fw);
-
-        String decryptedContendArray[] = content.getArray();
-
-        for (int i = 0; i < decryptedContendArray.length; i++) {
-
-            if (decryptedContendArray[i] != null) {
-                bw.append(decryptedContendArray[i]);
-                bw.newLine();
-            } else {
-                bw.close();
-            }
-        }
-    }
-
 }
