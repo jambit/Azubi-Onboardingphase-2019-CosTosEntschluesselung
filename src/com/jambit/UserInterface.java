@@ -1,8 +1,5 @@
 package com.jambit;
 
-import com.sun.xml.internal.fastinfoset.util.StringArray;
-
-import java.io.File;
 import java.io.IOException;
 import java.util.Random;
 import java.util.Scanner;
@@ -82,7 +79,7 @@ public class UserInterface {
 
         codecUtility.setKey(generateRandomKey());
         codecUtility.setSeed(generateRandomSeed());
-        System.out.println("\nyour seed and key are: " + codecUtility.getSeed() + ":" + codecUtility.getKey()+"\n");
+        System.out.println("\nyour seed and key are: " + codecUtility.getSeed() + ":" + codecUtility.getKey() + "\n");
         int seed = codecUtility.getSeed();
         int key = codecUtility.getKey();
         encryptFromToWithSeedAndKey(Constants.DEFAULT_DECRYPTED_FILE_PATH, Constants.DEFAULT_ENCRYPTED_FILE_PATH, seed, key);
@@ -143,52 +140,5 @@ public class UserInterface {
         int max = 2147483646;
         Random r = new Random();
         return r.nextInt(max) + 1;
-    }
-
-
-
-
-    //TODO: remove redundant code
-
-    private StringArray readFile(String filePath) throws IOException {
-        InputReader inputReader = new InputReader();
-        return inputReader.readFile(filePath);
-    }
-
-    private StringArray printSeedMenue() throws IOException {
-        Scanner sc = new Scanner(System.in);
-        InputReader inputReader = new InputReader();
-
-        System.out.println("please enter your [seed]:[key]");
-
-        //Todo: Extract to METHOD
-        final StringArray decryptedFileContent = inputReader.readFile("DecryptedText.txt");
-        return decryptedFileContent;
-    }
-
-    boolean checkFileIfExists(String pathname) {
-        boolean fileExists;
-        File file = new File(pathname);
-        fileExists = file.exists();
-        return fileExists;
-    }
-
-    void printContent(StringArray content) {
-        // prints out the content in console
-        for (int i = 0; i < content.getSize(); i++) {
-            System.out.println(content.get(i));
-        }
-    }
-
-    void writeDecryptedContentInFile(StringArray decryptedContent)
-            throws IOException {
-        CustomFileWriter customFileWriter = new CustomFileWriter();
-        customFileWriter.write(decryptedContent, Constants.DEFAULT_DECRYPTED_FILE_PATH);
-    }
-
-    void writeEncryptedContentToFile(StringArray encryptedContent)
-            throws IOException {
-        CustomFileWriter customFileWriter = new CustomFileWriter();
-        customFileWriter.write(encryptedContent, Constants.DEFAULT_ENCRYPTED_FILE_PATH);
     }
 }
